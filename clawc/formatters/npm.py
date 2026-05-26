@@ -1,0 +1,14 @@
+from __future__ import annotations
+
+from ._base import Formatter
+
+
+class NpmFormatter(Formatter):
+    def can_handle(self, tool_name: str, tool_input: dict, content: str) -> bool:
+        cmd = tool_input.get("command", "")
+        return tool_name == "Bash" and (cmd.startswith("npm ") or cmd.startswith("npx "))
+
+    def format(self, content: str) -> str:
+        lines = content.splitlines()
+        out = [l for l in lines if not l.startswith("npm warn") and not l.startswith("npm notice")]
+        return "\n".join(out) if out else content
