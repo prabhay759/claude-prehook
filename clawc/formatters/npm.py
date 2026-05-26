@@ -10,5 +10,8 @@ class NpmFormatter(Formatter):
 
     def format(self, content: str) -> str:
         lines = content.splitlines()
-        out = [l for l in lines if not l.startswith("npm warn") and not l.startswith("npm notice")]
+        out = [
+            ln for ln in lines
+            if not ln.startswith("npm warn") and not ln.startswith("npm notice")
+        ]
         return "\n".join(out) if out else content

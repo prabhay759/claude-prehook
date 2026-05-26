@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-import json
 import re
 
-import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
+from clawc.cache.dedup import extract_hash_prefix, is_ref_token, make_ref_token, sha256_hex
 from clawc.pipeline.stages.condense_logs import CondenseLogs
 from clawc.pipeline.stages.strip_ansi import StripAnsi
-from clawc.pipeline.stages.strip_nulls import StripNulls
 
 _ANSI_FREE_RE = re.compile(r"\x1b\[")
 
@@ -65,9 +63,6 @@ def test_condense_preserves_short_repeats() -> None:
     text = "a\na\na\nb\nb\nb"
     result = stage_condense.apply(text)
     assert result is None or result.count("a") >= 3
-
-
-from clawc.cache.dedup import extract_hash_prefix, is_ref_token, make_ref_token, sha256_hex
 
 
 @given(st.text())

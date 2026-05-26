@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -23,7 +23,7 @@ def write_session_summary(stats: dict[str, Any], cwd: str = "") -> None:
     path = _memory_path(cwd)
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     entry = (
         f"\n## Session {now}\n"
         f"- Compressions: {stats.get('total_compressions', 0)}\n"

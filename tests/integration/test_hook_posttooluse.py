@@ -5,8 +5,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 
 def run_hook(stdin_data: dict, env_extras: dict | None = None) -> tuple[int, dict]:
     import os

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import contextlib
 import json
-import os
 import socket
 import sys
 from pathlib import Path
@@ -16,10 +16,11 @@ def _handle_request(data: bytes) -> bytes:
     except json.JSONDecodeError:
         return b"{}"
 
+    from clawc.hooks import posttooluse, precompact, pretooluse, sessionstart, stop
     from clawc.hooks._protocol import HookInput
-    from clawc.hooks import posttooluse, pretooluse, sessionstart, precompact, stop
 
-    inp = HookInput(**{k: inp_dict.get(k, v.default) for k, v in HookInput.__dataclass_fields__.items()})  # type: ignore[attr-defined]
+    fields = HookInput.__dataclass_fields__  # type: ignore[attr-defined]
+    inp = HookInput(**{k: inp_dict.get(k, v.default) for k, v in fields.items()})
 
     import io
     sys.stdout = buf = io.StringIO()
@@ -34,10 +35,8 @@ def _handle_request(data: bytes) -> bytes:
         }
         handler = dispatch.get(inp.hook_event_name)
         if handler:
-            try:
+            with contextlib.suppress(SystemExit):
                 handler(inp)
-            except SystemExit:
-                pass
     finally:
         sys.stdout = sys.__stdout__
 

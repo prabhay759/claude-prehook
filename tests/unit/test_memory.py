@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from clawc.memory.claude_md import (
     MAX_LINES,
     build_claude_md_block,

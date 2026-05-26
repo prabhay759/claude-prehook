@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-from clawc.cache.dedup import make_ref_token, sha256_hex
+from clawc.cache.dedup import sha256_hex
 from clawc.cache.store import CacheStore
 
 

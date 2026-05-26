@@ -4,8 +4,7 @@ import ast
 import re
 from pathlib import Path
 
-_JS_IMPORT_RE = re.compile(r"""(?:import|require)\s*(?:\(?\s*)?['"]([^'"]+)['"]"""
-)
+_JS_IMPORT_RE = re.compile(r"""(?:import|require)\s*(?:\(?\s*)?['\"]([\'\"]+)['\"]""")
 
 
 def extract_python_imports(source: str) -> list[str]:
@@ -18,9 +17,8 @@ def extract_python_imports(source: str) -> list[str]:
         if isinstance(node, ast.Import):
             for alias in node.names:
                 imports.append(alias.name)
-        elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                imports.append(node.module)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imports.append(node.module)
     return imports
 
 

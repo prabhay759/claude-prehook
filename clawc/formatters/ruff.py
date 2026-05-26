@@ -12,5 +12,8 @@ class RuffFormatter(Formatter):
 
     def format(self, content: str) -> str:
         lines = content.splitlines()
-        out = [l for l in lines if not l.startswith("Checking ") and not l.startswith("Watching")]
+        out = [
+            ln for ln in lines
+            if not ln.startswith("Checking ") and not ln.startswith("Watching")
+        ]
         return "\n".join(out) if out else content

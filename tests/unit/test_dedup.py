@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from clawc.cache.dedup import (
     REF_PREFIX,
     REF_SUFFIX,

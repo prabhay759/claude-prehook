@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from .strip_ansi import StripAnsi
-from .strip_nulls import StripNulls
-from .strip_fields import StripFields
-from .condense_logs import CondenseLogs
-from .truncate_strings import TruncateStrings
-from .flatten_json import FlattenJson
 from .collapse_arrays import CollapseArrays
+from .condense_logs import CondenseLogs
+from .flatten_json import FlattenJson
 from .prose_textrank import ProseTextrank
+from .strip_ansi import StripAnsi
+from .strip_fields import StripFields
+from .strip_nulls import StripNulls
+from .truncate_strings import TruncateStrings
 
 
 class Stage(ABC):

@@ -25,7 +25,7 @@ class HookInput:
     model: str = ""
 
     @classmethod
-    def from_stdin(cls) -> "HookInput":
+    def from_stdin(cls) -> HookInput:
         try:
             raw: dict[str, Any] = json.load(sys.stdin)
         except (json.JSONDecodeError, EOFError):

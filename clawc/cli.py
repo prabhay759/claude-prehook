@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -18,8 +17,8 @@ def hook(
     event: str = typer.Argument(..., help="Hook event name (PostToolUse, SessionStart, …)"),
 ) -> None:
     """Dispatch a Claude Code hook event (stdin → stdout, used by settings.json)."""
+    from clawc.hooks import posttooluse, precompact, pretooluse, sessionstart, stop
     from clawc.hooks._protocol import HookInput
-    from clawc.hooks import posttooluse, pretooluse, sessionstart, precompact, stop
 
     inp = HookInput.from_stdin()
     if event and not inp.hook_event_name:
@@ -40,7 +39,7 @@ def hook(
 
 @app.command()
 def compress(
-    input: typer.FileText = typer.Argument(default="-", help="Input file (- for stdin)"),
+    input: typer.FileText = typer.Argument(default="-", help="Input file (- for stdin)"),  # noqa: B008
     tool_name: str = typer.Option("Bash", "--tool", help="Pretend output came from this tool"),
 ) -> None:
     """Compress text through the pipeline and print result."""
@@ -74,7 +73,7 @@ def expand(
 
 @app.command()
 def stats(
-    session: Optional[str] = typer.Option(None, "--session", "-s", help="Filter by session ID"),
+    session: str | None = typer.Option(None, "--session", "-s", help="Filter by session ID"),
     json_out: bool = typer.Option(False, "--json", help="Output as JSON"),
 ) -> None:
     """Show compression statistics."""
@@ -108,13 +107,20 @@ def init(
     dry_run: bool = typer.Option(False, "--dry-run", help="Print what would change, don't write"),
 ) -> None:
     """Wire clawc hooks into Claude Code settings.json."""
+    def _cmd(event: str, timeout: int, matcher: str = "") -> list:
+        entry: dict = {"type": "command", "command": f"clawc hook {event}", "timeout": timeout}
+        hook: dict = {"hooks": [entry]}
+        if matcher:
+            hook["matcher"] = matcher
+        return [hook]
+
     _HOOK_WIRING = {
         "hooks": {
-            "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "clawc hook PreToolUse", "timeout": 10}]}],
-            "PostToolUse": [{"matcher": "Bash|Read|Edit|MultiEdit|Grep|Glob", "hooks": [{"type": "command", "command": "clawc hook PostToolUse", "timeout": 15}]}],
-            "SessionStart": [{"hooks": [{"type": "command", "command": "clawc hook SessionStart", "timeout": 5}]}],
-            "PreCompact": [{"hooks": [{"type": "command", "command": "clawc hook PreCompact", "timeout": 5}]}],
-            "Stop": [{"hooks": [{"type": "command", "command": "clawc hook Stop", "timeout": 10}]}],
+            "PreToolUse": _cmd("PreToolUse", 10, "Bash"),
+            "PostToolUse": _cmd("PostToolUse", 15, "Bash|Read|Edit|MultiEdit|Grep|Glob"),
+            "SessionStart": _cmd("SessionStart", 5),
+            "PreCompact": _cmd("PreCompact", 5),
+            "Stop": _cmd("Stop", 10),
         }
     }
 
@@ -178,7 +184,14 @@ def memory(
     show: bool = typer.Option(False, "--show", help="Print current CLAUDE.md content"),
 ) -> None:
     """Manage CLAUDE.md memory files."""
-    from clawc.memory.claude_md import MAX_LINES, _tier_paths, build_claude_md_block, read_tier, sync_build_commands, write_tier
+    from clawc.memory.claude_md import (
+        MAX_LINES,
+        _tier_paths,
+        build_claude_md_block,
+        read_tier,
+        sync_build_commands,
+        write_tier,
+    )
 
     paths = _tier_paths(str(Path.cwd()))
     path = paths.get(tier, paths["project"])

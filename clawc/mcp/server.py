@@ -6,11 +6,11 @@ from pathlib import Path
 
 async def _serve() -> None:
     try:
+        from mcp import types  # type: ignore[import]
         from mcp.server import Server  # type: ignore[import]
         from mcp.server.stdio import stdio_server  # type: ignore[import]
-        from mcp import types  # type: ignore[import]
-    except ImportError:
-        raise SystemExit("mcp package not installed. Run: pip install mcp")
+    except ImportError as exc:
+        raise SystemExit("mcp package not installed. Run: pip install mcp") from exc
 
     from clawc.cache.store import CacheStore
     from clawc.pipeline import run as pipeline_run

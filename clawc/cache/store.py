@@ -6,7 +6,7 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-from .dedup import make_ref_token, sha256_hex
+from .dedup import make_ref_token
 
 SCHEMA_VERSION = 1
 
@@ -114,7 +114,7 @@ class CacheStore:
         self._conn = conn
 
     @classmethod
-    def open(cls, db_path: Path | None = None) -> "CacheStore":
+    def open(cls, db_path: Path | None = None) -> CacheStore:
         return cls(_connect(db_path or _default_db_path()))
 
     def close(self) -> None:

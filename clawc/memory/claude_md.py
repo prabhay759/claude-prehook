@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 from pathlib import Path
 from typing import Any
@@ -43,10 +44,8 @@ def sync_build_commands(project_root: Path) -> dict[str, str]:
     for name, parser in manifests.items():
         f = project_root / name
         if f.exists():
-            try:
+            with contextlib.suppress(Exception):
                 cmds.update(parser(f.read_text(encoding="utf-8")))
-            except Exception:
-                pass
     return cmds
 
 
@@ -60,7 +59,8 @@ def _parse_pyproject(content: str) -> dict[str, str]:
         data = tomllib.loads(content)
     except Exception:
         return cmds
-    scripts = data.get("tool", {}).get("hatch", {}).get("envs", {}).get("default", {}).get("scripts", {})
+    hatch_envs = data.get("tool", {}).get("hatch", {}).get("envs", {}).get("default", {})
+    scripts = hatch_envs.get("scripts", {})
     for name, cmd in scripts.items():
         cmds[name] = cmd if isinstance(cmd, str) else cmd[0] if cmd else ""
     for name, ep in data.get("project", {}).get("scripts", {}).items():
