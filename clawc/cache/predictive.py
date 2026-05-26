@@ -4,7 +4,7 @@ import ast
 import re
 from pathlib import Path
 
-_JS_IMPORT_RE = re.compile(r"""(?:import|require)\s*(?:\(?\s*)?['\"]([\'\"]+)['\"]""")
+_JS_IMPORT_RE = re.compile(r"""(?:import|require)\s*(?:\(?\s*)?['"]([^'"]+)['"]""")
 
 
 def extract_python_imports(source: str) -> list[str]:
